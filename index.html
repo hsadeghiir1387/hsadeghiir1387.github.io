@@ -26,7 +26,7 @@
 
         /* حالت شب */
         body.dark-mode {
-            --sky: #0b1021; /* آسمان تاریک عمیق */
+            --sky: #0b1021;
             --cloud: #1e293b;
             --brick-orange: #8b3a12; 
             --brick-dark: #5c240a;
@@ -67,6 +67,33 @@
         }
         .theme-toggle:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--shadow-color); }
 
+        /* 🟢 شمارنده بازدید (مثل امتیاز بازی) */
+        .hit-counter {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--shadow-color); 
+            color: var(--coin-yellow);
+            border: 3px solid var(--coin-yellow);
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            box-shadow: 4px 4px 0 var(--coin-yellow);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            direction: ltr; /* برای درست نشان دادن اعداد و فونت پیکسلی */
+        }
+        
+        .hit-counter svg {
+            width: 20px; height: 20px;
+            animation: spinCoin 3s linear infinite;
+        }
+
+        @keyframes spinCoin {
+            0% { transform: scaleX(1); }
+            50% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+
         /* ---------------- دنیای بازی ---------------- */
         .game-world {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 180px;
@@ -75,7 +102,6 @@
             background: var(--sky); transition: background 0.5s ease;
         }
 
-        /* ماه و ستاره‌ها برای حالت شب */
         .moon {
             position: absolute; top: 20px; right: 10%;
             width: 50px; height: 50px;
@@ -121,7 +147,6 @@
             50% { transform: translateY(-120px); }
         }
 
-        /* ابرها */
         .cloud-tool {
             position: absolute; width: 140px; height: 70px;
             display: flex; align-items: center; justify-content: center;
@@ -144,13 +169,12 @@
             100% { right: 105%; }
         }
 
-        /* ---------------- استایل موانع و دشمنان ---------------- */
+        /* ---------------- موانع ---------------- */
         .obstacle {
             position: absolute; bottom: 40px; z-index: 5;
             right: -60px; 
         }
 
-        /* لوله‌ها */
         .pipe {
             width: 40px; height: 60px;
             background-color: var(--pipe-green);
@@ -162,7 +186,6 @@
             background-color: var(--pipe-green); border: 3px solid var(--shadow-color); border-radius: 3px;
         }
 
-        /* گیاه پیرانا */
         .piranha {
             position: absolute; bottom: 80px; left: 5px; width: 30px; height: 40px;
             animation: chomp 1.5s infinite alternate;
@@ -172,7 +195,6 @@
             100% { transform: translateY(-10px); }
         }
 
-        /* گومبا */
         .goomba {
             width: 40px; height: 40px; bottom: 40px;
             animation: walk 0.5s infinite alternate;
@@ -231,7 +253,6 @@
             padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
         }
         
-        /* استایل آیکون‌های SVG */
         .icon-svg {
             width: 24px; height: 24px;
             fill: var(--coin-yellow);
@@ -266,12 +287,22 @@
             .contact-pipes { flex-direction: column; }
             .pipe-link { text-align: center; }
             .game-box { padding: 15px; }
+            .hit-counter { font-size: 0.7rem; padding: 8px 10px; }
         }
     </style>
 </head>
 <body>
 
     <button class="theme-toggle" id="themeBtn" title="تغییر تم">🌙</button>
+
+    <!-- 🟢 شمارنده بازدید -->
+    <div class="hit-counter pixel-font">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="12" cy="12" rx="9" ry="10" fill="#fcd800" stroke="#000" stroke-width="2"/>
+            <rect x="9" y="7" width="6" height="10" fill="#fff" stroke="none" opacity="0.6"/>
+        </svg>
+        <span id="visitCount">...</span>
+    </div>
 
     <div class="game-world" id="gameWorld">
         <div class="stars"></div>
@@ -290,7 +321,6 @@
             <span>ASP.NET</span>
         </div>
         
-        <!-- شخصیت ماریو -->
         <div class="player" id="player">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6h16v4H4z" fill="#ff0000" stroke="#000" stroke-width="1.5"/>
@@ -315,7 +345,6 @@
 
         <div class="game-box">
             <h2>
-                <!-- آیکون ماریو برای درباره من -->
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 6h16v4H4z"/><path d="M6 10h12v8H6z" fill="#ffccaa"/><path d="M8 14h8v2H8z" fill="#000" stroke="none"/><path d="M6 18h12v4H6z" fill="#0000ff"/></svg>
                 درباره من
             </h2>
@@ -326,7 +355,6 @@
 
         <div class="game-box">
             <h2>
-                <!-- آیکون ستاره برای مهارت‌ها -->
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 مهارت‌ها و آیتم‌ها
             </h2>
@@ -339,7 +367,6 @@
 
         <div class="game-box">
             <h2>
-                <!-- آیکون جعبه سوال برای سوابق -->
                 <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#eab308"/><text x="12" y="17" font-size="14" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle" stroke="none">?</text></svg>
                 سوابق کاری (Levels)
             </h2>
@@ -349,7 +376,6 @@
 
         <div class="game-box">
             <h2>
-                <!-- آیکون سکه برای پروژه‌ها -->
                 <svg class="icon-svg" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="10" fill="#fcd800"/><rect x="9" y="7" width="6" height="10" fill="#fff" stroke="none" opacity="0.5"/></svg>
                 پروژه‌های در حال توسعه
             </h2>
@@ -359,7 +385,6 @@
 
         <div class="game-box">
             <h2>
-                <!-- آیکون کلاه فارغ‌التحصیلی برای تحصیلات -->
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
                 تحصیلات
             </h2>
@@ -392,15 +417,12 @@
             const obstacle = document.createElement('div');
             obstacle.classList.add('obstacle');
             
-            // انتخاب رندوم نوع مانع (لوله، گومبا)
             const type = Math.random();
             
             if (type > 0.5) {
-                // لوله با گیاه پیرانا
                 const pipe = document.createElement('div');
                 pipe.classList.add('pipe');
                 
-                // 30% شانس داشتن گیاه پیرانا
                 if (Math.random() > 0.7) {
                     const piranha = document.createElement('div');
                     piranha.classList.add('piranha');
@@ -413,7 +435,6 @@
                 }
                 obstacle.appendChild(pipe);
             } else {
-                // دشمن گومبا
                 const goomba = document.createElement('div');
                 goomba.classList.add('goomba');
                 goomba.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -429,7 +450,7 @@
             gameWorld.appendChild(obstacle);
 
             let pos = -60;
-            let hasJumped = false; // قفل برای جلوگیری از پرش دوباره
+            let hasJumped = false;
 
             const moveInterval = setInterval(() => {
                 pos += gameSpeed;
@@ -441,20 +462,17 @@
 
                 const distance = obstaclePosFromLeft - playerPos;
                 
-                // 🔴 پرش فقط یک بار برای هر مانع انجام می‌شود
                 if (distance < 150 && distance > 100 && !isJumping && !hasJumped) {
                     jump();
                     hasJumped = true;
                 }
 
-                // اگر مانع از سمت چپ خارج شد، پاک شود
                 if (obstaclePosFromLeft < -60) {
                     clearInterval(moveInterval);
                     obstacle.remove();
                 }
             }, 16); 
 
-            // زمان‌بندی رندوم برای مانع بعدی
             const nextSpawnTime = Math.floor(Math.random() * 1500) + 2000;
             setTimeout(createObstacle, nextSpawnTime);
         }
@@ -466,16 +484,31 @@
             setTimeout(() => {
                 player.classList.remove('jumping');
                 isJumping = false;
-            }, 650); // هماهنگ با زمان انیمیشن CSS
+            }, 650);
         }
 
-        // شروع
         createObstacle();
 
         window.addEventListener('resize', () => {
             const obstacles = document.querySelectorAll('.obstacle');
             obstacles.forEach(obs => obs.remove());
         });
+
+        // ------------------ شمارنده بازدید ------------------
+        // این API رایگان است و برای هر بازدید یک عدد به شمارنده اضافه می‌کند
+        const visitCountElement = document.getElementById('visitCount');
+        const namespace = 'hsadeghiir1387-portfolio'; // یک شناسه منحصر به فرد
+        const key = 'visits';
+
+        fetch(`https://abacus.jasoncameron.dev/hit/${namespace}/${key}`)
+            .then(response => response.json())
+            .then(data => {
+                visitCountElement.textContent = data.value;
+            })
+            .catch(error => {
+                console.error('Error fetching visit count:', error);
+                visitCountElement.textContent = '0';
+            });
     </script>
 
 </body>
