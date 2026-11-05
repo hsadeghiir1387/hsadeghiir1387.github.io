@@ -24,7 +24,6 @@
             --moon-opacity: 0;
         }
 
-        /* حالت شب */
         body.dark-mode {
             --sky: #0b1021;
             --cloud: #1e293b;
@@ -58,35 +57,34 @@
 
         .pixel-font { font-family: 'Press Start 2P', cursive; direction: ltr; display: inline-block; }
 
-        /* دکمه تغییر تم */
-        .theme-toggle {
+        .top-controls {
             position: fixed; top: 20px; left: 20px;
+            display: flex; gap: 10px; z-index: 100; flex-wrap: wrap;
+        }
+
+        .control-btn {
             background: var(--text-box); border: 3px solid var(--shadow-color);
             padding: 10px; cursor: pointer; font-size: 1.5rem;
-            box-shadow: 4px 4px 0 var(--shadow-color); z-index: 100; transition: all 0.1s;
+            box-shadow: 4px 4px 0 var(--shadow-color); transition: all 0.1s;
+            display: flex; align-items: center; justify-content: center;
         }
-        .theme-toggle:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--shadow-color); }
+        .control-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--shadow-color); }
 
-        /* 🟢 شمارنده بازدید (مثل امتیاز بازی) */
+        .download-btn {
+            font-size: 1rem; font-family: 'Vazirmatn', sans-serif; font-weight: bold;
+            padding: 10px 20px; background: var(--pipe-green); color: #fff;
+            border: 3px solid var(--shadow-color); box-shadow: 4px 4px 0 var(--shadow-color);
+        }
+
         .hit-counter {
             position: fixed; top: 20px; right: 20px;
-            background: var(--shadow-color); 
-            color: var(--coin-yellow);
-            border: 3px solid var(--coin-yellow);
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            box-shadow: 4px 4px 0 var(--coin-yellow);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            direction: ltr; /* برای درست نشان دادن اعداد و فونت پیکسلی */
+            background: var(--shadow-color); color: var(--coin-yellow);
+            border: 3px solid var(--coin-yellow); padding: 10px 15px;
+            font-size: 0.9rem; box-shadow: 4px 4px 0 var(--coin-yellow);
+            z-index: 100; display: flex; align-items: center; gap: 10px; direction: ltr; 
         }
         
-        .hit-counter svg {
-            width: 20px; height: 20px;
-            animation: spinCoin 3s linear infinite;
-        }
+        .hit-counter svg { width: 20px; height: 20px; animation: spinCoin 3s linear infinite; }
 
         @keyframes spinCoin {
             0% { transform: scaleX(1); }
@@ -94,7 +92,6 @@
             100% { transform: scaleX(1); }
         }
 
-        /* ---------------- دنیای بازی ---------------- */
         .game-world {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 180px;
             z-index: -1; pointer-events: none; overflow: hidden;
@@ -104,16 +101,13 @@
 
         .moon {
             position: absolute; top: 20px; right: 10%;
-            width: 50px; height: 50px;
-            background: #fde047; border-radius: 50%;
-            box-shadow: 0 0 20px #fde047;
-            opacity: var(--moon-opacity); transition: opacity 0.5s;
+            width: 50px; height: 50px; background: #fde047; border-radius: 50%;
+            box-shadow: 0 0 20px #fde047; opacity: var(--moon-opacity); transition: opacity 0.5s;
         }
         .stars {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(white 1px, transparent 1px), radial-gradient(white 1px, transparent 1px);
-            background-size: 50px 50px, 100px 100px;
-            background-position: 0 0, 25px 25px;
+            background-size: 50px 50px, 100px 100px; background-position: 0 0, 25px 25px;
             opacity: var(--star-opacity); transition: opacity 0.5s;
         }
 
@@ -134,13 +128,10 @@
         }
 
         .player {
-            position: absolute; bottom: 40px; left: 20%; width: 40px; height: 40px;
-            z-index: 10;
+            position: absolute; bottom: 40px; left: 20%; width: 40px; height: 40px; z-index: 10;
         }
 
-        .player.jumping {
-            animation: jumpAnim 0.65s ease-in-out;
-        }
+        .player.jumping { animation: jumpAnim 0.65s ease-in-out; }
 
         @keyframes jumpAnim {
             0%, 100% { transform: translateY(0); }
@@ -169,17 +160,11 @@
             100% { right: 105%; }
         }
 
-        /* ---------------- موانع ---------------- */
-        .obstacle {
-            position: absolute; bottom: 40px; z-index: 5;
-            right: -60px; 
-        }
+        .obstacle { position: absolute; bottom: 40px; z-index: 5; right: -60px; }
 
         .pipe {
-            width: 40px; height: 60px;
-            background-color: var(--pipe-green);
-            border: 3px solid var(--shadow-color);
-            border-radius: 5px 5px 0 0;
+            width: 40px; height: 60px; background-color: var(--pipe-green);
+            border: 3px solid var(--shadow-color); border-radius: 5px 5px 0 0;
         }
         .pipe::before {
             content: ''; position: absolute; top: -10px; left: -6px; right: -6px; height: 15px;
@@ -204,7 +189,6 @@
             100% { transform: rotate(5deg); }
         }
 
-        /* ---------------- محتوا ---------------- */
         .container { max-width: 800px; margin: 40px auto; padding: 0 20px; position: relative; z-index: 10; }
         header { text-align: center; margin-bottom: 40px; }
 
@@ -254,10 +238,8 @@
         }
         
         .icon-svg {
-            width: 24px; height: 24px;
-            fill: var(--coin-yellow);
-            stroke: var(--shadow-color);
-            stroke-width: 2;
+            width: 24px; height: 24px; fill: var(--coin-yellow);
+            stroke: var(--shadow-color); stroke-width: 2;
         }
 
         p, li { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
@@ -282,20 +264,64 @@
 
         .sub-info { background: var(--shadow-color); color: var(--coin-yellow); padding: 2px 8px; font-size: 0.9rem; display: inline-block; margin-bottom: 10px; }
 
+        /* 🔴 بخش تولید PDF: به طور پیش‌فرض در صفحه مرورگر مخفی است */
+        #resume-for-pdf {
+            display: none;
+        }
+
+        /* 🔴 استایل‌های اختصاصی برای زمانی که دستور چاپ (Print) صادر می‌شود */
+        @media print {
+            /* مخفی کردن همه چیز */
+            body * {
+                visibility: hidden;
+            }
+            /* نمایش فقط بخش PDF */
+            #resume-for-pdf, #resume-for-pdf * {
+                visibility: visible;
+            }
+            /* قرار دادن PDF در بالای صفحه */
+            #resume-for-pdf {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 20px;
+            }
+            
+            /* استایل‌های داخلی PDF برای چاپ */
+            #resume-for-pdf h1 { color: #111; font-size: 2rem; margin-bottom: 10px; text-shadow: none; }
+            #resume-for-pdf h2 { color: #2b6cb0; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-top: 25px; font-size: 1.3rem; display: block; }
+            #resume-for-pdf p, #resume-for-pdf li { color: #333; font-size: 1rem; font-weight: normal; }
+            #resume-for-pdf .header-info { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+            #resume-for-pdf .skills-list { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; }
+            #resume-for-pdf .skill-item { background: #edf2f7; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
+            
+            @page { margin: 1cm; }
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 1.8rem; }
             .contact-pipes { flex-direction: column; }
             .pipe-link { text-align: center; }
             .game-box { padding: 15px; }
             .hit-counter { font-size: 0.7rem; padding: 8px 10px; }
+            .top-controls { left: 10px; top: 10px; gap: 5px; }
+            .control-btn { padding: 8px; font-size: 1.2rem; }
+            .download-btn { font-size: 0.8rem; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" id="themeBtn" title="تغییر تم">🌙</button>
+    <div class="top-controls">
+        <button class="control-btn" id="themeBtn" title="تغییر تم">🌙</button>
+        <button class="control-btn" id="soundBtn" title="قطع/وصل صدا">🔊</button>
+        <button class="control-btn download-btn" id="downloadPdfBtn" title="دانلود PDF">📄 دانلود PDF</button>
+    </div>
 
-    <!-- 🟢 شمارنده بازدید -->
     <div class="hit-counter pixel-font">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="12" cy="12" rx="9" ry="10" fill="#fcd800" stroke="#000" stroke-width="2"/>
@@ -398,6 +424,43 @@
         </div>
     </div>
 
+    <!-- بخش مخفی تولید PDF -->
+    <div id="resume-for-pdf">
+        <div class="header-info">
+            <div>
+                <h1>حسین صادقی</h1>
+                <p style="color: #2b6cb0; font-weight: bold; margin: 0;">توسعه‌دهنده بازی (Game Developer)</p>
+            </div>
+            <div style="text-align: left; font-size: 0.9rem; color: #555;">
+                <p style="margin: 0;">کاشان، ایران</p>
+                <p style="margin: 0;">hsadeghiir1387@gmail.com</p>
+                <p style="margin: 0;">github.com/hsadeghiir1387</p>
+            </div>
+        </div>
+
+        <h2>درباره من</h2>
+        <p>من حسین صادقی، هنرجوی پایه دوازدهم رشته شبکه و نرم‌افزار هستم. تمرکز اصلی من بر توسعه بازی با موتور Godot است و در کنار آن با فریم‌ورک ASP.NET Core نیز کار می‌کنم. هدف من ساخت بازی‌هایی است که هم از نظر فنی بهینه و هم از نظر طراحی جذاب باشند.</p>
+
+        <h2>مهارت‌ها</h2>
+        <ul class="skills-list">
+            <li class="skill-item">Godot (GDScript)</li>
+            <li class="skill-item">ASP.NET Core</li>
+            <li class="skill-item">Blender (3D Modeling)</li>
+        </ul>
+
+        <h2>سوابق کاری</h2>
+        <p><strong>آشید استودیو</strong> | توسعه‌دهنده بازی</p>
+        <p>در حال کار روی یک پروژه بازی مهارتی برای کودکان.</p>
+
+        <h2>پروژه‌ها</h2>
+        <p><strong>بازی‌های مهارتی کودکان</strong> | Godot / GDScript</p>
+        <p>در حال توسعه پروژه طراحی بازی‌های مهارتی برای کودکان با زبان GdScript با موتور Godot.</p>
+
+        <h2>تحصیلات</h2>
+        <p><strong>هنرستان</strong> | شبکه و نرم‌افزار</p>
+        <p>پایه دوازدهم</p>
+    </div>
+
     <script>
         // تغییر تم
         const themeBtn = document.getElementById('themeBtn');
@@ -406,6 +469,39 @@
             body.classList.toggle('dark-mode');
             themeBtn.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙';
         });
+
+        // مدیریت صدا
+        let soundEnabled = true;
+        const soundBtn = document.getElementById('soundBtn');
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        const jumpSound = new Audio('https://cdn.jsdelivr.net/gh/Adrianalcr/Super-Mario@master/sons/mario_jump.mp3');
+        jumpSound.load();
+        const coinSound = new Audio('https://cdn.jsdelivr.net/gh/Adrianalcr/Super-Mario@master/sons/coin.wav');
+        coinSound.load();
+        
+        let audioUnlocked = false;
+
+        document.body.addEventListener('click', function unlockAudio() {
+            if (audioUnlocked) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                if (ctx.state === 'suspended') {
+                    ctx.resume().then(() => { audioUnlocked = true; });
+                } else { audioUnlocked = true; }
+            } else { audioUnlocked = true; }
+        }, { once: true });
+
+        function playSound(audio) {
+            if (!soundEnabled) return;
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("Audio play blocked:", e));
+        }
 
         // ------------------ منطق بازی ------------------
         const gameWorld = document.getElementById('gameWorld');
@@ -480,6 +576,7 @@
         function jump() {
             isJumping = true;
             player.classList.add('jumping');
+            playSound(jumpSound);
 
             setTimeout(() => {
                 player.classList.remove('jumping');
@@ -495,20 +592,43 @@
         });
 
         // ------------------ شمارنده بازدید ------------------
-        // این API رایگان است و برای هر بازدید یک عدد به شمارنده اضافه می‌کند
         const visitCountElement = document.getElementById('visitCount');
-        const namespace = 'hsadeghiir1387-portfolio'; // یک شناسه منحصر به فرد
-        const key = 'visits';
+        const namespace = 'hsadeghiir1387-portfolio';
+        const key = 'visits-v2';
+        const hasVisited = localStorage.getItem('hasVisitedBefore');
 
-        fetch(`https://abacus.jasoncameron.dev/hit/${namespace}/${key}`)
-            .then(response => response.json())
-            .then(data => {
-                visitCountElement.textContent = data.value;
-            })
-            .catch(error => {
-                console.error('Error fetching visit count:', error);
-                visitCountElement.textContent = '0';
-            });
+        if (!hasVisited) {
+            fetch(`https://abacus.jasoncameron.dev/hit/${namespace}/${key}`)
+                .then(response => response.json())
+                .then(data => {
+                    visitCountElement.textContent = data.value;
+                    localStorage.setItem('hasVisitedBefore', 'true');
+                })
+                .catch(error => {
+                    console.error('Error fetching visit count:', error);
+                    visitCountElement.textContent = '0';
+                });
+        } else {
+            fetch(`https://abacus.jasoncameron.dev/get/${namespace}/${key}`)
+                .then(response => response.json())
+                .then(data => {
+                    visitCountElement.textContent = data.value;
+                })
+                .catch(error => {
+                    console.error('Error fetching visit count:', error);
+                    visitCountElement.textContent = '0';
+                });
+        }
+
+        // 🔴 راه‌حل نهایی و تضمینی PDF با استفاده از سیستم چاپ مرورگر
+        document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+            playSound(coinSound);
+            
+            // کمی تاخیر تا صدای سکه پخش بشه و بعد پنجره چاپ باز بشه
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        });
     </script>
 
 </body>
