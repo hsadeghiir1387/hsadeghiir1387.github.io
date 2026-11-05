@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسین صادقی | Game Developer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --sky: #5c94fc;
+            --cloud: #ffffff;
+            --brick-orange: #e45c10;
+            --brick-dark: #c84c0c;
+            --pipe-green: #00a800;
+            --pipe-dark: #007800;
+            --coin-yellow: #fcd800;
+            --text-box: #fcfcfc;
+            --text-dark: #000000;
+            --shadow-color: #000000;
+            --ground-color: #c84c0c;
+            --ground-line: #000000;
+            --star-opacity: 0;
+            --moon-opacity: 0;
+        }
+
+        /* حالت شب */
+        body.dark-mode {
+            --sky: #0b1021; /* آسمان تاریک عمیق */
+            --cloud: #1e293b;
+            --brick-orange: #8b3a12; 
+            --brick-dark: #5c240a;
+            --pipe-green: #0f4d26; 
+            --pipe-dark: #0a3619;
+            --coin-yellow: #facc15;
+            --text-box: #1e293b;
+            --text-dark: #f8fafc;
+            --shadow-color: #000000;
+            --ground-color: #5c240a;
+            --ground-line: #000000;
+            --star-opacity: 1;
+            --moon-opacity: 1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--sky);
+            color: var(--text-dark);
+            line-height: 1.8;
+            min-height: 100vh;
+            padding-bottom: 120px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        .pixel-font { font-family: 'Press Start 2P', cursive; direction: ltr; display: inline-block; }
+
+        /* دکمه تغییر تم */
+        .theme-toggle {
+            position: fixed; top: 20px; left: 20px;
+            background: var(--text-box); border: 3px solid var(--shadow-color);
+            padding: 10px; cursor: pointer; font-size: 1.5rem;
+            box-shadow: 4px 4px 0 var(--shadow-color); z-index: 100; transition: all 0.1s;
+        }
+        .theme-toggle:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--shadow-color); }
+
+        /* ---------------- دنیای بازی ---------------- */
+        .game-world {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 180px;
+            z-index: -1; pointer-events: none; overflow: hidden;
+            border-top: 4px solid var(--ground-line);
+            background: var(--sky); transition: background 0.5s ease;
+        }
+
+        /* ماه و ستاره‌ها برای حالت شب */
+        .moon {
+            position: absolute; top: 20px; right: 10%;
+            width: 50px; height: 50px;
+            background: #fde047; border-radius: 50%;
+            box-shadow: 0 0 20px #fde047;
+            opacity: var(--moon-opacity); transition: opacity 0.5s;
+        }
+        .stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px), radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px, 100px 100px;
+            background-position: 0 0, 25px 25px;
+            opacity: var(--star-opacity); transition: opacity 0.5s;
+        }
+
+        .ground {
+            position: absolute; bottom: 0; left: 0; width: 200%; height: 40px;
+            background-color: var(--ground-color);
+            background-image: 
+                linear-gradient(90deg, var(--ground-line) 2px, transparent 2px),
+                linear-gradient(0deg, var(--ground-line) 2px, transparent 2px);
+            background-size: 40px 20px;
+            animation: scrollGround 2s linear infinite;
+            border-top: 4px solid var(--ground-line);
+        }
+
+        @keyframes scrollGround {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .player {
+            position: absolute; bottom: 40px; left: 20%; width: 40px; height: 40px;
+            z-index: 10;
+        }
+
+        .player.jumping {
+            animation: jumpAnim 0.65s ease-in-out;
+        }
+
+        @keyframes jumpAnim {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-120px); }
+        }
+
+        /* ابرها */
+        .cloud-tool {
+            position: absolute; width: 140px; height: 70px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-dark); font-weight: 900; font-size: 0.95rem;
+            animation: scrollCloud 15s linear infinite; z-index: 1;
+        }
+
+        .cloud-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; fill: var(--cloud); stroke: var(--shadow-color); stroke-width: 3px;
+            transition: fill 0.5s;
+        }
+
+        .tool-godot { top: 10px; animation-duration: 12s; }
+        .tool-blender { top: 50px; animation-duration: 18s; animation-delay: 3s; }
+        .tool-asp { top: 30px; animation-duration: 15s; animation-delay: 8s; }
+
+        @keyframes scrollCloud {
+            0% { right: -200px; }
+            100% { right: 105%; }
+        }
+
+        /* ---------------- استایل موانع و دشمنان ---------------- */
+        .obstacle {
+            position: absolute; bottom: 40px; z-index: 5;
+            right: -60px; 
+        }
+
+        /* لوله‌ها */
+        .pipe {
+            width: 40px; height: 60px;
+            background-color: var(--pipe-green);
+            border: 3px solid var(--shadow-color);
+            border-radius: 5px 5px 0 0;
+        }
+        .pipe::before {
+            content: ''; position: absolute; top: -10px; left: -6px; right: -6px; height: 15px;
+            background-color: var(--pipe-green); border: 3px solid var(--shadow-color); border-radius: 3px;
+        }
+
+        /* گیاه پیرانا */
+        .piranha {
+            position: absolute; bottom: 80px; left: 5px; width: 30px; height: 40px;
+            animation: chomp 1.5s infinite alternate;
+        }
+        @keyframes chomp {
+            0% { transform: translateY(20px); }
+            100% { transform: translateY(-10px); }
+        }
+
+        /* گومبا */
+        .goomba {
+            width: 40px; height: 40px; bottom: 40px;
+            animation: walk 0.5s infinite alternate;
+        }
+        @keyframes walk {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+
+        /* ---------------- محتوا ---------------- */
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; position: relative; z-index: 10; }
+        header { text-align: center; margin-bottom: 40px; }
+
+        .name-block {
+            background-color: var(--brick-orange); border: 4px solid var(--shadow-color);
+            padding: 20px; display: inline-block; box-shadow: 6px 6px 0 var(--shadow-color);
+            position: relative; transition: background-color 0.5s;
+        }
+
+        .name-block::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(to right, transparent 48%, var(--shadow-color) 48%, var(--shadow-color) 52%, transparent 52%),
+                linear-gradient(to bottom, transparent 48%, var(--shadow-color) 48%, var(--shadow-color) 52%, transparent 52%);
+            background-size: 40px 20px; opacity: 0.2; pointer-events: none;
+        }
+
+        h1 {
+            color: #fff; font-size: 2.5rem;
+            text-shadow: 3px 3px 0 var(--shadow-color), -1px -1px 0 var(--shadow-color), 1px -1px 0 var(--shadow-color), -1px 1px 0 var(--shadow-color), 1px 1px 0 var(--shadow-color);
+            margin: 0; position: relative; z-index: 2;
+        }
+
+        .role {
+            background-color: var(--coin-yellow); border: 3px solid var(--shadow-color);
+            display: inline-block; padding: 5px 15px; margin-top: 15px;
+            font-weight: bold; font-size: 1.1rem; box-shadow: 4px 4px 0 var(--shadow-color); color: #000;
+        }
+
+        .game-box {
+            background-color: var(--text-box); border: 4px solid var(--shadow-color);
+            padding: 25px; margin-bottom: 30px; box-shadow: 6px 6px 0 var(--shadow-color);
+            position: relative; transition: background-color 0.5s, color 0.5s;
+        }
+
+        .game-box::after {
+            content: '?'; font-family: 'Press Start 2P', cursive;
+            position: absolute; top: -15px; right: -15px;
+            background-color: var(--coin-yellow); color: #000;
+            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; border: 3px solid var(--shadow-color);
+        }
+
+        h2 { 
+            font-size: 1.3rem; margin-bottom: 15px; border-bottom: 3px dashed var(--shadow-color); 
+            padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
+        }
+        
+        /* استایل آیکون‌های SVG */
+        .icon-svg {
+            width: 24px; height: 24px;
+            fill: var(--coin-yellow);
+            stroke: var(--shadow-color);
+            stroke-width: 2;
+        }
+
+        p, li { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+        ul { list-style: none; padding-right: 0; }
+        li { display: flex; align-items: center; }
+        
+        .coin-icon {
+            width: 16px; height: 16px; margin-left: 10px;
+            fill: var(--coin-yellow); stroke: var(--shadow-color); stroke-width: 2;
+        }
+
+        .contact-pipes { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px; }
+
+        .pipe-link {
+            text-decoration: none; color: #fff; font-weight: bold; background-color: var(--pipe-green);
+            border: 4px solid var(--shadow-color); padding: 15px 30px;
+            box-shadow: inset -4px -4px 0 rgba(0,0,0,0.3), inset 4px 4px 0 rgba(255,255,255,0.2), 6px 6px 0 var(--shadow-color);
+            transition: all 0.1s; position: relative;
+        }
+        .pipe-link:hover { transform: translateY(-5px); background-color: var(--pipe-dark); }
+        .pipe-link:active { transform: translateY(2px); box-shadow: inset -4px -4px 0 rgba(0,0,0,0.3), inset 4px 4px 0 rgba(255,255,255,0.2), 2px 2px 0 var(--shadow-color); }
+
+        .sub-info { background: var(--shadow-color); color: var(--coin-yellow); padding: 2px 8px; font-size: 0.9rem; display: inline-block; margin-bottom: 10px; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .contact-pipes { flex-direction: column; }
+            .pipe-link { text-align: center; }
+            .game-box { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="theme-toggle" id="themeBtn" title="تغییر تم">🌙</button>
+
+    <div class="game-world" id="gameWorld">
+        <div class="stars"></div>
+        <div class="moon"></div>
+
+        <div class="cloud-tool tool-godot">
+            <svg class="cloud-svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M10,40 Q0,40 0,30 Q0,20 15,20 Q20,5 40,5 Q60,5 65,20 Q85,20 85,30 Q85,40 75,40 Z" /></svg>
+            <span>Godot</span>
+        </div>
+        <div class="cloud-tool tool-blender">
+            <svg class="cloud-svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M10,40 Q0,40 0,30 Q0,20 15,20 Q20,5 40,5 Q60,5 65,20 Q85,20 85,30 Q85,40 75,40 Z" /></svg>
+            <span>Blender</span>
+        </div>
+        <div class="cloud-tool tool-asp">
+            <svg class="cloud-svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M10,40 Q0,40 0,30 Q0,20 15,20 Q20,5 40,5 Q60,5 65,20 Q85,20 85,30 Q85,40 75,40 Z" /></svg>
+            <span>ASP.NET</span>
+        </div>
+        
+        <!-- شخصیت ماریو -->
+        <div class="player" id="player">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6h16v4H4z" fill="#ff0000" stroke="#000" stroke-width="1.5"/>
+                <path d="M6 10h12v8H6z" fill="#ffccaa" stroke="#000" stroke-width="1.5"/>
+                <path d="M8 14h8v2H8z" fill="#000"/>
+                <path d="M14 11h2v2h-2z" fill="#000"/>
+                <path d="M6 18h12v4H6z" fill="#0000ff" stroke="#000" stroke-width="1.5"/>
+            </svg>
+        </div>
+        
+        <div class="ground"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="name-block">
+                <h1>حسین صادقی</h1>
+            </div>
+            <br>
+            <div class="role">توسعه‌دهنده بازی <span class="pixel-font">(GAME DEV)</span></div>
+        </header>
+
+        <div class="game-box">
+            <h2>
+                <!-- آیکون ماریو برای درباره من -->
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 6h16v4H4z"/><path d="M6 10h12v8H6z" fill="#ffccaa"/><path d="M8 14h8v2H8z" fill="#000" stroke="none"/><path d="M6 18h12v4H6z" fill="#0000ff"/></svg>
+                درباره من
+            </h2>
+            <p>
+                من حسین صادقی، هنرجوی پایه دوازدهم رشته شبکه و نرم‌افزار هستم. تمرکز اصلی من بر توسعه بازی با موتور <strong>Godot</strong> است و در کنار آن با فریم‌ورک <strong>ASP.NET Core</strong> نیز کار می‌کنم. هدف من ساخت بازی‌هایی است که هم از نظر فنی بهینه و هم از نظر طراحی جذاب باشند.
+            </p>
+        </div>
+
+        <div class="game-box">
+            <h2>
+                <!-- آیکون ستاره برای مهارت‌ها -->
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                مهارت‌ها و آیتم‌ها
+            </h2>
+            <ul>
+                <li><svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg> توسعه بازی با موتور Godot (Gd Script)</li>
+                <li><svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg> برنامه‌نویسی بک‌اند با ASP.NET CORE</li>
+                <li><svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg> طراحی سه‌بعدی با نرم‌افزار Blender</li>
+            </ul>
+        </div>
+
+        <div class="game-box">
+            <h2>
+                <!-- آیکون جعبه سوال برای سوابق -->
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#eab308"/><text x="12" y="17" font-size="14" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle" stroke="none">?</text></svg>
+                سوابق کاری (Levels)
+            </h2>
+            <div class="sub-info pixel-font">ASHID STUDIO</div>
+            <p>در حال کار در استودیو آشید روی یک پروژه بازی مهارتی برای کودکان.</p>
+        </div>
+
+        <div class="game-box">
+            <h2>
+                <!-- آیکون سکه برای پروژه‌ها -->
+                <svg class="icon-svg" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="10" fill="#fcd800"/><rect x="9" y="7" width="6" height="10" fill="#fff" stroke="none" opacity="0.5"/></svg>
+                پروژه‌های در حال توسعه
+            </h2>
+            <div class="sub-info pixel-font">GODOT / GDScript</div>
+            <p>در حال توسعه پروژه طراحی بازی‌های مهارتی برای کودکان با زبان GdScript با موتور Godot. تمرکز بر روی مکانیک‌های ساده اما چالش‌برانگیز.</p>
+        </div>
+
+        <div class="game-box">
+            <h2>
+                <!-- آیکون کلاه فارغ‌التحصیلی برای تحصیلات -->
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                تحصیلات
+            </h2>
+            <div class="sub-info pixel-font">HIGH SCHOOL</div>
+            <p>سال دوازدهم هنرستان، رشته شبکه و نرم‌افزار.</p>
+        </div>
+
+        <div class="contact-pipes">
+            <a href="mailto:hsadeghiir1387@gmail.com" class="pipe-link">ارسال ایمیل</a>
+            <a href="https://github.com/hsadeghiir1387" target="_blank" class="pipe-link">مشاهده گیت‌هاب</a>
+        </div>
+    </div>
+
+    <script>
+        // تغییر تم
+        const themeBtn = document.getElementById('themeBtn');
+        const body = document.body;
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            themeBtn.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // ------------------ منطق بازی ------------------
+        const gameWorld = document.getElementById('gameWorld');
+        const player = document.getElementById('player');
+        let isJumping = false;
+        let gameSpeed = 4; 
+
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            
+            // انتخاب رندوم نوع مانع (لوله، گومبا)
+            const type = Math.random();
+            
+            if (type > 0.5) {
+                // لوله با گیاه پیرانا
+                const pipe = document.createElement('div');
+                pipe.classList.add('pipe');
+                
+                // 30% شانس داشتن گیاه پیرانا
+                if (Math.random() > 0.7) {
+                    const piranha = document.createElement('div');
+                    piranha.classList.add('piranha');
+                    piranha.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8 2 4 6 4 10c0 4 3 8 8 12 5-4 8-8 8-12 0-4-4-8-8-8z" fill="#e74c3c" stroke="#000" stroke-width="1.5"/>
+                        <circle cx="9" cy="9" r="2" fill="#fff"/><circle cx="15" cy="9" r="2" fill="#fff"/>
+                        <path d="M10 14h4v2h-4z" fill="#fff"/>
+                    </svg>`;
+                    obstacle.appendChild(piranha);
+                }
+                obstacle.appendChild(pipe);
+            } else {
+                // دشمن گومبا
+                const goomba = document.createElement('div');
+                goomba.classList.add('goomba');
+                goomba.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12c0-4 3.5-8 8-8s8 4 8 8v4H4v-4z" fill="#8b4513" stroke="#000" stroke-width="1.5"/>
+                    <path d="M6 16h12v4H6z" fill="#000"/>
+                    <circle cx="8" cy="10" r="2" fill="#fff"/><circle cx="16" cy="10" r="2" fill="#fff"/>
+                    <path d="M9 12h6v2H9z" fill="#000"/>
+                </svg>`;
+                obstacle.appendChild(goomba);
+            }
+
+            obstacle.style.right = '-60px'; 
+            gameWorld.appendChild(obstacle);
+
+            let pos = -60;
+            let hasJumped = false; // قفل برای جلوگیری از پرش دوباره
+
+            const moveInterval = setInterval(() => {
+                pos += gameSpeed;
+                obstacle.style.right = pos + 'px';
+
+                const screenWidth = window.innerWidth;
+                const playerPos = screenWidth * 0.20; 
+                const obstaclePosFromLeft = screenWidth - pos;
+
+                const distance = obstaclePosFromLeft - playerPos;
+                
+                // 🔴 پرش فقط یک بار برای هر مانع انجام می‌شود
+                if (distance < 150 && distance > 100 && !isJumping && !hasJumped) {
+                    jump();
+                    hasJumped = true;
+                }
+
+                // اگر مانع از سمت چپ خارج شد، پاک شود
+                if (obstaclePosFromLeft < -60) {
+                    clearInterval(moveInterval);
+                    obstacle.remove();
+                }
+            }, 16); 
+
+            // زمان‌بندی رندوم برای مانع بعدی
+            const nextSpawnTime = Math.floor(Math.random() * 1500) + 2000;
+            setTimeout(createObstacle, nextSpawnTime);
+        }
+
+        function jump() {
+            isJumping = true;
+            player.classList.add('jumping');
+
+            setTimeout(() => {
+                player.classList.remove('jumping');
+                isJumping = false;
+            }, 650); // هماهنگ با زمان انیمیشن CSS
+        }
+
+        // شروع
+        createObstacle();
+
+        window.addEventListener('resize', () => {
+            const obstacles = document.querySelectorAll('.obstacle');
+            obstacles.forEach(obs => obs.remove());
+        });
+    </script>
+
+</body>
+</html>
